@@ -1,0 +1,47 @@
+{% extends 'chat/telegram_base.html' %}
+
+{% block title %}Yangi Chat Yaratish - Live Chat{% endblock %}
+
+{% block content %}
+<div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div style="background: #212121; padding: 40px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); width: 500px; max-width: 90vw;">
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">➕</div>
+            <h1 style="color: #ffffff; font-size: 24px; font-weight: 600; margin-bottom: 8px;">Yangi Chat Yaratish</h1>
+            <p style="color: #8b8b8b; font-size: 16px;">Chat xonasi yaratib, do'stlaringiz bilan muloqot qiling</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; color: #ffffff; font-size: 14px; font-weight: 500; margin-bottom: 8px;">
+                    Chat Nomi *
+                </label>
+                <input type="text" 
+                       name="room_name" 
+                       placeholder="Masalan: Do'stlar Guruhi" 
+                       required
+                       style="width: 100%; padding: 16px; background: #2f2f2f; border: 2px solid transparent; border-radius: 12px; color: #ffffff; font-size: 15px; transition: border-color 0.15s ease;"
+                       onfocus="this.style.borderColor='#2563eb'"
+                       onblur="this.style.borderColor='transparent'">
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+                <a href="{% url 'chat:index' %}" 
+                   style="flex: 1; padding: 16px; background: #6c757d; color: white; text-align: center; border-radius: 12px; text-decoration: none; font-size: 16px; font-weight: 600; transition: background 0.15s ease;"
+                   onmouseover="this.style.background='#5a6268'"
+                   onmouseout="this.style.background='#6c757d'">
+                    Bekor qilish
+                </a>
+                
+                <button type="submit" 
+                        style="flex: 2; padding: 16px; background: #2563eb; border: none; border-radius: 12px; color: #ffffff; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;"
+                        onmouseover="this.style.background='#1d4ed8'"
+                        onmouseout="this.style.background='#2563eb'">
+                    Chat Yaratish
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

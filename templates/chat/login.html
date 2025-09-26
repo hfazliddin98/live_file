@@ -1,0 +1,56 @@
+{% extends 'chat/base.html' %}
+
+{% block title %}Kirish - Live Chat{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 2rem auto; padding: 2rem;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🔐</div>
+        <h1 style="color: #333; margin-bottom: 0.5rem;">Xush Kelibsiz</h1>
+        <p style="color: #666;">Hisobingizga kiring</p>
+    </div>
+
+    <form method="post" style="background: rgba(255,255,255,0.9); padding: 2rem; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label for="username" style="display: block; color: #333; font-weight: 600; margin-bottom: 0.5rem;">
+                👤 Foydalanuvchi nomi
+            </label>
+            <input type="text" 
+                   id="username" 
+                   name="username" 
+                   required 
+                   placeholder="Foydalanuvchi nomingizni kiriting"
+                   style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease;"
+                   onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.1)'"
+                   onblur="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'">
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+            <label for="password" style="display: block; color: #333; font-weight: 600; margin-bottom: 0.5rem;">
+                🔒 Parol
+            </label>
+            <input type="password" 
+                   id="password" 
+                   name="password" 
+                   required 
+                   placeholder="Parolingizni kiriting"
+                   style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease;"
+                   onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.1)'"
+                   onblur="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'">
+        </div>
+
+        <button type="submit" 
+                style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 1rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-bottom: 1rem;"
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(102,126,234,0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            🚀 Kirish
+        </button>
+
+        <div style="text-align: center;">
+            <p style="color: #666;">Admin tomonidan yaratilgan hisobingiz bilan kiring</p>
+        </div>
+    </form>
+</div>
+{% endblock %}

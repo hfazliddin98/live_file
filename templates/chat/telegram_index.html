@@ -1,0 +1,164 @@
+{% extends 'chat/telegram_base.html' %}
+
+{% block title %}Live Chat{% endblock %}
+
+{% block content %}
+{% if not user.is_authenticated %}
+    <!-- Login form -->
+    <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div style="background: #212121; padding: 40px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); width: 400px; max-width: 90vw;">
+            <div style="text-align: center; margin-bottom: 32px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">💬</div>
+                <h1 style="color: #ffffff; font-size: 28px; font-weight: 600; margin-bottom: 8px;">Live Chat</h1>
+                <p style="color: #8b8b8b; font-size: 16px;">Admin tomonidan yaratilgan hisobingiz bilan kiring</p>
+            </div>
+
+            <form method="post" action="{% url 'chat:login' %}">
+                {% csrf_token %}
+                <div style="margin-bottom: 20px;">
+                    <input type="text" 
+                           name="username" 
+                           placeholder="Foydalanuvchi nomi" 
+                           required
+                           style="width: 100%; padding: 16px; background: #2f2f2f; border: 2px solid transparent; border-radius: 12px; color: #ffffff; font-size: 15px; transition: border-color 0.15s ease;"
+                           onfocus="this.style.borderColor='#2563eb'"
+                           onblur="this.style.borderColor='transparent'">
+                </div>
+                <div style="margin-bottom: 32px;">
+                    <input type="password" 
+                           name="password" 
+                           placeholder="Parol" 
+                           required
+                           style="width: 100%; padding: 16px; background: #2f2f2f; border: 2px solid transparent; border-radius: 12px; color: #ffffff; font-size: 15px; transition: border-color 0.15s ease;"
+                           onfocus="this.style.borderColor='#2563eb'"
+                           onblur="this.style.borderColor='transparent'">
+                </div>
+                <button type="submit" 
+                        style="width: 100%; padding: 16px; background: #2563eb; border: none; border-radius: 12px; color: #ffffff; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;"
+                        onmouseover="this.style.background='#1d4ed8'"
+                        onmouseout="this.style.background='#2563eb'">
+                    Kirish
+                </button>
+            </form>
+        </div>
+    </div>
+{% else %}
+    <!-- Telegram-style chat interface -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="user-info">
+                <div class="user-avatar">{{ user.username.0|upper }}</div>
+                <div class="user-details">
+                    <h3>{{ user.username }}</h3>
+                    <p>Onlayn</p>
+                </div>
+                <div style="margin-left: auto;">
+                    <a href="{% url 'chat:logout' %}" 
+                       style="color: #8b8b8b; text-decoration: none; padding: 8px; border-radius: 50%; display: inline-block; transition: background 0.15s ease;"
+                       onmouseover="this.style.background='#2f2f2f'"
+                       onmouseout="this.style.background='transparent'"
+                       title="Chiqish">
+                        🚪
+                    </a>
+                </div>
+            </div>
+            <input type="text" class="search-box" placeholder="Chatlarni qidirish..." id="searchBox">
+            <div style="margin-top: 16px;">
+                <a href="{% url 'chat:create_room' %}" 
+                   style="display: inline-flex; align-items: center; gap: 8px; background: #2563eb; color: white; padding: 10px 16px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.15s ease;"
+                   onmouseover="this.style.background='#1d4ed8'"
+                   onmouseout="this.style.background='#2563eb'">
+                    <span style="font-size: 16px;">➕</span> Yangi Chat
+                </a>
+            </div>
+        </div>
+
+        <div class="chat-list">
+            {% for room in rooms %}
+                <div class="chat-item" style="position: relative; padding: 12px 20px; cursor: pointer; transition: background 0.15s ease; border-bottom: 1px solid #2a2a2a;" onmouseover="this.style.background='#2a2a2a'; this.querySelector('.room-delete-btn').style.opacity='1'" onmouseout="this.style.background='transparent'; this.querySelector('.room-delete-btn').style.opacity='0'">
+                    <a href="{% url 'chat:room' room.id %}" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="chat-header">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px;">
+                                {{ room.name.0|upper }}
+                            </div>
+                            <div>
+                                <div class="chat-name">{{ room.name }}</div>
+                                <div class="chat-preview">
+                                    {% if room.message_set.last %}
+                                        {{ room.message_set.last.user.username }}: {{ room.message_set.last.content|default:"📎 Fayl"|truncatechars:30 }}
+                                    {% else %}
+                                        Hali xabar yo'q
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="chat-time">
+                                {% if room.message_set.last %}
+                                    {{ room.message_set.last.timestamp|date:"H:i" }}
+                                {% endif %}
+                            </div>
+                            <div style="display: flex; gap: 4px; justify-content: flex-end; margin-top: 4px;">
+                                {% if room.created_by == user %}
+                                    <div style="background: #ffd700; color: #000; padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: 600;">
+                                        Admin
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    </a>
+                    {% if room.created_by == user %}
+                        <div style="position: absolute; top: 8px; right: 8px; opacity: 0; transition: opacity 0.2s ease;" class="room-delete-btn">
+                            <form method="post" action="{% url 'chat:delete_room' room.id %}" style="display: inline;" onsubmit="return confirm('Bu xonani butunlay o\'chirishni xohlaysizmi?')">
+                                {% csrf_token %}
+                                <button type="submit" style="background: #ff4757; border: none; color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease;" onmouseover="this.style.background='#ff3742'" onmouseout="this.style.background='#ff4757'">
+                                    ✕
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div style="padding: 40px 20px; text-align: center; color: #8b8b8b;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">💬</div>
+                    <h3 style="color: #ffffff; margin-bottom: 8px;">Chat yo'q</h3>
+                    <p>Birinchi chatni yaratib boshlang!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="welcome-screen">
+            <div class="icon">💬</div>
+            <h2>Live Chat ga xush kelibsiz!</h2>
+            <p>Chat boshlash uchun chap tarafdan xonani tanlang yoki yangi chat yarating</p>
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        document.getElementById('searchBox').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const chatItems = document.querySelectorAll('.chat-item');
+            
+            chatItems.forEach(item => {
+                const chatName = item.querySelector('.chat-name').textContent.toLowerCase();
+                if (chatName.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('open');
+        }
+    </script>
+{% endif %}
+{% endblock %}

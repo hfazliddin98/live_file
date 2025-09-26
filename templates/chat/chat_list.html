@@ -1,0 +1,62 @@
+{% extends 'chat/base.html' %}
+
+{% block title %}Chatlar - Live Chat{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="color: #333; margin-bottom: 1rem;">💬 Live Chat Xonalari</h1>
+        <p style="color: #666; font-size: 1.1rem;">Chatlarni tanlang yoki yangi chat yarating</p>
+    </div>
+
+    {% if rooms %}
+    <div class="chat-rooms-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+        {% for room_member in rooms %}
+        <div class="chat-room-card" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 15px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease;" 
+             onmouseover="this.style.transform='translateY(-5px)'" 
+             onmouseout="this.style.transform='translateY(0)'">
+            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem; margin-right: 1rem;">
+                    {{ room_member.room.name|first|upper }}
+                </div>
+                <div>
+                    <h3 style="color: #333; margin: 0; font-size: 1.2rem;">{{ room_member.room.name }}</h3>
+                    <p style="color: #666; margin: 0.2rem 0 0 0; font-size: 0.9rem;">
+                        {% if room_member.is_admin %}👑 Admin{% else %}👤 A'zo{% endif %}
+                    </p>
+                </div>
+            </div>
+            
+            {% if room_member.room.description %}
+            <p style="color: #555; margin-bottom: 1rem; font-size: 0.95rem;">{{ room_member.room.description }}</p>
+            {% endif %}
+            
+            <div style="display: flex; justify-content: between; align-items: center; margin-top: 1rem;">
+                <small style="color: #888; font-size: 0.8rem;">
+                    Yaratilgan: {{ room_member.room.created_at|date:"d M Y" }}
+                </small>
+                <a href="{% url 'chat:room' room_member.room.name %}" 
+                   style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 0.6rem 1.2rem; border-radius: 25px; text-decoration: none; font-weight: 500; transition: all 0.3s ease;"
+                   onmouseover="this.style.transform='scale(1.05)'"
+                   onmouseout="this.style.transform='scale(1)'">
+                    Kirish →
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 3rem; background: rgba(255,255,255,0.8); border-radius: 15px; margin: 2rem 0;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">💭</div>
+        <h3 style="color: #666; margin-bottom: 1rem;">Hech qanday chat yo'q</h3>
+        <p style="color: #888; margin-bottom: 2rem;">Birinchi chatni yarating va muloqotni boshlang!</p>
+        <a href="{% url 'chat:create_room' %}" 
+           style="background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 1rem 2rem; border-radius: 30px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s ease;"
+           onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(40,167,69,0.4)'"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            ➕ Yangi Chat Yaratish
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

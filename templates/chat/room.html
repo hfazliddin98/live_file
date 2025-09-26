@@ -1,0 +1,125 @@
+{% extends 'chat/base.html' %}
+
+{% block title %}{{ room.name }} - Live Chat{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 1rem auto; padding: 1rem;">
+    <!-- Room Header -->
+    <div style="background: rgba(255,255,255,0.9); border-radius: 15px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+        <div style="display: flex; align-items: center; justify-content: between; flex-wrap: wrap; gap: 1rem;">
+            <div style="flex: 1;">
+                <h1 style="color: #333; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                    🏠 {{ room.name }}
+                    {% if room.created_by == user %}
+                        <span style="background: #ffd700; color: #333; padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+                            Admin
+                        </span>
+                    {% endif %}
+                </h1>
+                {% if room.description %}
+                    <p style="color: #666; margin: 0;">{{ room.description }}</p>
+                {% endif %}
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="{% url 'chat:index' %}" 
+                   style="background: #6c757d; color: white; padding: 0.5rem 1rem; border-radius: 20px; text-decoration: none; font-weight: 500;"
+                   onmouseover="this.style.backgroundColor='#5a6268'"
+                   onmouseout="this.style.backgroundColor='#6c757d'">
+                    ← Orqaga
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Messages Area -->
+    <div style="background: rgba(255,255,255,0.9); border-radius: 15px; margin-bottom: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+        <div style="max-height: 400px; overflow-y: auto; padding: 1.5rem;" id="chat-messages">
+            {% for message in messages %}
+                <div style="margin-bottom: 1rem; {% if message.user == user %}text-align: right;{% endif %}">
+                    <div style="display: inline-block; max-width: 70%; {% if message.user == user %}background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 20px 20px 5px 20px;{% else %}background: #f8f9fa; color: #333; border-radius: 20px 20px 20px 5px;{% endif %} padding: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem; {% if message.user == user %}opacity: 0.8;{% else %}color: #667eea;{% endif %}">
+                            {% if message.user == user %}
+                                Siz
+                            {% else %}
+                                {{ message.user.username }}
+                            {% endif %}
+                        </div>
+                        <div style="word-break: break-word;">
+                            {{ message.content }}
+                        </div>
+                        {% if message.file %}
+                            <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.2);">
+                                <a href="{{ message.file.url }}" 
+                                   download
+                                   style="{% if message.user == user %}color: rgba(255,255,255,0.9);{% else %}color: #667eea;{% endif %} text-decoration: none; font-weight: 500;"
+                                   onmouseover="this.style.textDecoration='underline'"
+                                   onmouseout="this.style.textDecoration='none'">
+                                    📁 {{ message.file.name|slice:"10:" }}
+                                </a>
+                            </div>
+                        {% endif %}
+                        <div style="font-size: 0.75rem; margin-top: 0.5rem; {% if message.user == user %}opacity: 0.7;{% else %}color: #999;{% endif %}">
+                            {{ message.timestamp|date:"H:i" }}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div style="text-align: center; color: #999; padding: 2rem;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">💬</div>
+                    <p>Bu yerda hali xabarlar yo'q. Birinchi xabarni yozing!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Message Input Form -->
+    <div style="background: rgba(255,255,255,0.9); border-radius: 15px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+        <form method="post" enctype="multipart/form-data" style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
+            {% csrf_token %}
+            <div style="flex: 1; min-width: 200px;">
+                <textarea name="content" 
+                          placeholder="Xabaringizni yozing..." 
+                          rows="2" 
+                          style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 15px; font-size: 1rem; resize: vertical; transition: all 0.3s ease; font-family: inherit;"
+                          onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.1)'"
+                          onblur="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'"
+                          onkeypress="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); this.form.submit();}"></textarea>
+            </div>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <label style="background: #17a2b8; color: white; padding: 1rem; border-radius: 10px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;"
+                       onmouseover="this.style.backgroundColor='#138496'; this.style.transform='translateY(-2px)'"
+                       onmouseout="this.style.backgroundColor='#17a2b8'; this.style.transform='translateY(0)'">
+                    📎 Fayl
+                    <input type="file" name="file" style="display: none;">
+                </label>
+                <button type="submit" 
+                        style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 1rem 1.5rem; border-radius: 10px; font-weight: 500; cursor: pointer; transition: all 0.3s ease;"
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(40,167,69,0.4)'"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    ✉️ Yuborish
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Auto-scroll to bottom of messages
+document.addEventListener('DOMContentLoaded', function() {
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+});
+
+// Show selected file name
+document.querySelector('input[type="file"]').addEventListener('change', function() {
+    const label = this.parentElement;
+    if (this.files.length > 0) {
+        label.innerHTML = '📎 ' + this.files[0].name.substring(0, 20) + (this.files[0].name.length > 20 ? '...' : '');
+        label.style.background = '#28a745';
+    } else {
+        label.innerHTML = '📎 Fayl';
+        label.style.background = '#17a2b8';
+    }
+});
+</script>
+{% endblock %}
