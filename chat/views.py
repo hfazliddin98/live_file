@@ -27,23 +27,26 @@ def login_view(request):
         return redirect('chat:index')
     
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
         
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            # next parameter'ni tekshirish
-            next_url = request.GET.get('next', 'chat:index')
-            if next_url and next_url.startswith('/'):
-                return redirect(next_url)
-            return redirect('chat:index')
+        if username and password:
+            user = authenticate(request, username=username, password=password)
+            if user is not None and user.is_active:
+                login(request, user)
+                # next parameter'ni tekshirish
+                next_url = request.GET.get('next')
+                if next_url and next_url.startswith('/') and next_url != '/login/':
+                    return redirect(next_url)
+                return redirect('chat:index')
     
     # Cache'ni oldini olish uchun response headers
     response = render(request, "chat/login.html")
     response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
+    # CSRF cookie'ni force qilish
+    response['X-CSRFToken'] = request.META.get('CSRF_COOKIE')
     return response
 
 

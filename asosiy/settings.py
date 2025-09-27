@@ -17,8 +17,20 @@ DEBUG = False
 DOMEN = 'file.kspi.uz'
 LOCAL_DOMEN = '127.0.0.1'
 
-ALLOWED_HOSTS = ['.kokanddeveloper.uz', DOMEN, 'localhost', LOCAL_DOMEN]
-CSRF_TRUSTED_ORIGINS=[f'https://{DOMEN}', f'http://{DOMEN}']
+ALLOWED_HOSTS = ['.kokanddeveloper.uz', DOMEN, 'localhost', LOCAL_DOMEN, '*']
+CSRF_TRUSTED_ORIGINS=[f'https://{DOMEN}', f'http://{DOMEN}', f'https://.kokanddeveloper.uz', f'http://.kokanddeveloper.uz']
+
+# Session settings for production
+SESSION_COOKIE_SECURE = False  # HTTPS uchun True qiling
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 86400  # 24 soat
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_SAVE_EVERY_REQUEST = True
+
+# CSRF settings
+CSRF_COOKIE_SECURE = False  # HTTPS uchun True qiling
+CSRF_COOKIE_HTTPONLY = True
+CSRF_USE_SESSIONS = True
 
 # Application definition
 INSTALLED_APPS = [
@@ -106,7 +118,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-# STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [BASE_DIR / 'static'] if DEBUG else []
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media files
@@ -120,3 +132,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+# Logging for production debugging
+if not DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'ERROR',
+                'class': 'logging.FileHandler',
+                'filename': BASE_DIR / 'django_errors.log',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'ERROR',
+                'propagate': True,
+            },
+        },
+    }
