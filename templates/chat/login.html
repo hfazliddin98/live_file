@@ -1,56 +1,156 @@
-{% extends 'chat/base.html' %}
+{% extends 'chat/telegram_base.html' %}
 
 {% block title %}Kirish - Live Chat{% endblock %}
 
 {% block content %}
-<div style="max-width: 400px; margin: 2rem auto; padding: 2rem;">
-    <div style="text-align: center; margin-bottom: 2rem;">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">🔐</div>
-        <h1 style="color: #333; margin-bottom: 0.5rem;">Xush Kelibsiz</h1>
-        <p style="color: #666;">Hisobingizga kiring</p>
-    </div>
-
-    <form method="post" style="background: rgba(255,255,255,0.9); padding: 2rem; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
-        {% csrf_token %}
-        
-        <div style="margin-bottom: 1.5rem;">
-            <label for="username" style="display: block; color: #333; font-weight: 600; margin-bottom: 0.5rem;">
-                👤 Foydalanuvchi nomi
-            </label>
-            <input type="text" 
-                   id="username" 
-                   name="username" 
-                   required 
-                   placeholder="Foydalanuvchi nomingizni kiriting"
-                   style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease;"
-                   onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.1)'"
-                   onblur="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'">
-        </div>
-
+<div class="login-container" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem;
+">
+    <div class="login-card" style="
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        padding: 3rem 2.5rem;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    ">
+        <!-- Logo/Icon -->
         <div style="margin-bottom: 2rem;">
-            <label for="password" style="display: block; color: #333; font-weight: 600; margin-bottom: 0.5rem;">
-                🔒 Parol
-            </label>
-            <input type="password" 
-                   id="password" 
-                   name="password" 
-                   required 
-                   placeholder="Parolingizni kiriting"
-                   style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease;"
-                   onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 3px rgba(102,126,234,0.1)'"
-                   onblur="this.style.borderColor='#e9ecef'; this.style.boxShadow='none'">
+            <div style="
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 1rem;
+                font-size: 2rem;
+            ">�</div>
+            <h1 style="
+                font-size: 1.8rem;
+                font-weight: 600;
+                color: #2c3e50;
+                margin: 0 0 0.5rem 0;
+            ">Live Chat</h1>
+            <p style="
+                color: #7f8c8d;
+                font-size: 0.95rem;
+                margin: 0;
+            ">Hisobingizga kiring</p>
         </div>
 
-        <button type="submit" 
-                style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 1rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-bottom: 1rem;"
-                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(102,126,234,0.4)'"
-                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-            🚀 Kirish
-        </button>
+        <!-- Login Form -->
+        <form method="post" style="text-align: left;">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label for="username" style="
+                    display: block;
+                    color: #34495e;
+                    font-weight: 500;
+                    margin-bottom: 0.5rem;
+                    font-size: 0.9rem;
+                ">Foydalanuvchi nomi</label>
+                <input type="text" 
+                       id="username" 
+                       name="username" 
+                       required 
+                       placeholder="Username kiriting"
+                       style="
+                           width: 100%;
+                           padding: 0.875rem 1rem;
+                           border: 2px solid #ecf0f1;
+                           border-radius: 8px;
+                           font-size: 1rem;
+                           transition: all 0.3s ease;
+                           background: #f8f9fa;
+                       "
+                       onfocus="this.style.borderColor='#667eea'; this.style.background='#fff'"
+                       onblur="this.style.borderColor='#ecf0f1'; this.style.background='#f8f9fa'">
+            </div>
 
-        <div style="text-align: center;">
-            <p style="color: #666;">Admin tomonidan yaratilgan hisobingiz bilan kiring</p>
-        </div>
-    </form>
+            <div style="margin-bottom: 2rem;">
+                <label for="password" style="
+                    display: block;
+                    color: #34495e;
+                    font-weight: 500;
+                    margin-bottom: 0.5rem;
+                    font-size: 0.9rem;
+                ">Parol</label>
+                <input type="password" 
+                       id="password" 
+                       name="password" 
+                       required 
+                       placeholder="Parolingizni kiriting"
+                       style="
+                           width: 100%;
+                           padding: 0.875rem 1rem;
+                           border: 2px solid #ecf0f1;
+                           border-radius: 8px;
+                           font-size: 1rem;
+                           transition: all 0.3s ease;
+                           background: #f8f9fa;
+                       "
+                       onfocus="this.style.borderColor='#667eea'; this.style.background='#fff'"
+                       onblur="this.style.borderColor='#ecf0f1'; this.style.background='#f8f9fa'">
+            </div>
+
+            <button type="submit" style="
+                width: 100%;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+                border: none;
+                padding: 0.875rem 1rem;
+                border-radius: 8px;
+                font-weight: 500;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin-bottom: 1.5rem;
+            " 
+            onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 8px 25px rgba(102,126,234,0.3)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                Kirish
+            </button>
+
+            <div style="text-align: center;">
+                <p style="
+                    color: #95a5a6;
+                    font-size: 0.85rem;
+                    line-height: 1.4;
+                    margin: 0;
+                ">Admin tomonidan yaratilgan<br>hisobingiz bilan kiring</p>
+            </div>
+        </form>
+    </div>
 </div>
+
+<script>
+// Cache busting
+window.addEventListener('load', function() {
+    if (performance.navigation.type == 1) {
+        // Sahifa reload qilindi
+        window.location.href = window.location.href + '?t=' + Date.now();
+    }
+});
+
+// Form submission cache prevention  
+document.querySelector('form').addEventListener('submit', function() {
+    // Form submit qilingandan keyin cache'ni tozalash
+    if ('caches' in window) {
+        caches.keys().then(function(names) {
+            names.forEach(function(name) {
+                caches.delete(name);
+            });
+        });
+    }
+});
+</script>
 {% endblock %}

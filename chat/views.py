@@ -8,6 +8,7 @@ import re
 from .models import Room, Message, RoomMember
 
 
+@login_required
 def index(request):
     rooms = Room.objects.all().order_by('-created_at')
     user_count = User.objects.count()
@@ -32,9 +33,18 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            # next parameter'ni tekshirish
+            next_url = request.GET.get('next', 'chat:index')
+            if next_url and next_url.startswith('/'):
+                return redirect(next_url)
             return redirect('chat:index')
     
-    return render(request, "chat/login.html")
+    # Cache'ni oldini olish uchun response headers
+    response = render(request, "chat/login.html")
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 
 

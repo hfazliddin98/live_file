@@ -13,7 +13,7 @@ SECRET_KEY = 'django-insecure-web-telegram-chat-2025-secret-key-change-in-produc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver', '*']
 
 # Application definition
 INSTALLED_APPS = [
