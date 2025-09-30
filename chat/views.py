@@ -72,11 +72,45 @@ def room(request, room_id):
         file = request.FILES.get('file')
         
         if content or file:
+            # Fayl xavfsizlik tekshiruvi
+            if file:
+                import os
+                import mimetypes
+                
+                # Fayl hajmini tekshirish (50MB limit)
+                max_size = 50 * 1024 * 1024  # 50MB
+                if file.size > max_size:
+                    return HttpResponse("Fayl hajmi 50MB dan katta bo'lishi mumkin emas", status=400)
+                
+                # Fayl kengaytmasini tekshirish
+                allowed_extensions = [
+                    '.txt', '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
+                    '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg',
+                    '.mp3', '.wav', '.mp4', '.avi', '.mkv', '.webm',
+                    '.zip', '.rar', '.7z', '.tar', '.gz'
+                ]
+                
+                file_ext = os.path.splitext(file.name)[1].lower()
+                if file_ext not in allowed_extensions:
+                    return HttpResponse(f"Fayl turi ruxsat etilmagan: {file_ext}", status=400)
+                
+                # MIME type tekshirish
+                content_type, _ = mimetypes.guess_type(file.name)
+                
+                # Fayl hajmi va turini saqlash
+                file_size = file.size
+                file_type = content_type
+            else:
+                file_size = 0
+                file_type = None
+            
             message = Message.objects.create(
                 room=room,
                 user=request.user,
                 content=content,
-                file=file
+                file=file,
+                file_size=file_size,
+                file_type=file_type
             )
             return redirect('chat:room', room_id=room_id)
     
@@ -244,3 +278,56 @@ def delete_file(request, message_id):
             pass
     
     return redirect('chat:index')
+
+
+@login_required
+def download_file(request, message_id):
+    """Xavfsiz fayl yuklash view'i"""
+    try:
+        message = get_object_or_404(Message, id=message_id)
+        
+        # Faqat xabar egasi yoki xona a'zosi yuklay oladi
+        if not (message.user == request.user or 
+               RoomMember.objects.filter(room=message.room, user=request.user).exists() or
+               message.room.created_by == request.user):
+            return HttpResponse("Ruxsat yo'q", status=403)
+        
+        if not message.file:
+            return HttpResponse("Fayl topilmadi", status=404)
+        
+        import os
+        import mimetypes
+        from django.http import FileResponse
+        from urllib.parse import quote
+        
+        file_path = message.file.path
+        if not os.path.exists(file_path):
+            return HttpResponse("Fayl topilmadi", status=404)
+        
+        # Fayl nomini olish
+        original_filename = os.path.basename(message.file.name)
+        
+        # MIME type aniqlash
+        content_type, _ = mimetypes.guess_type(file_path)
+        if not content_type:
+            content_type = 'application/octet-stream'
+        
+        # Xavfsiz fayl response yaratish
+        response = FileResponse(
+            open(file_path, 'rb'),
+            content_type=content_type,
+            as_attachment=True,
+            filename=original_filename
+        )
+        
+        # Xavfsizlik header'lari qo'shish
+        response['Content-Disposition'] = f'attachment; filename*=UTF-8\'\'{quote(original_filename)}'
+        response['X-Content-Type-Options'] = 'nosniff'
+        response['Content-Security-Policy'] = "default-src 'none'; sandbox"
+        response['X-Download-Options'] = 'noopen'
+        response['X-Permitted-Cross-Domain-Policies'] = 'none'
+        
+        return response
+        
+    except Exception as e:
+        return HttpResponse(f"Xatolik: {str(e)}", status=500)
